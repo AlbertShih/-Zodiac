@@ -36,19 +36,33 @@
         }
     </style>
 </head>
-<body>
+<body onload="init();">
      
     <canvas id="myCanvas"></canvas>
+    <div id="timer"></div>
     <div id="footer">AlbertShih</div>
-
 </body>
 </html>
-<script>
+<script>/*可能碰上問題
+    var PIXEL_RATIO = (function () {
+        var ctx = document.createElement("canvas").getContext("2d"),
+            dpr = window.devicePixelRatio || 1,
+            bsr = ctx.webkitBackingStorePixelRatio ||
+                  ctx.mozBackingStorePixelRatio ||
+                  ctx.msBackingStorePixelRatio ||
+                  ctx.oBackingStorePixelRatio ||
+                  ctx.backingStorePixelRatio || 1;
+
+        return dpr / bsr;
+    })();*/
+
+    // var $ = function (el) {
+    //     return document.querySelector(el);
+    // };
 
     // 比例為 4:3 ，橫向居中的方塊
     //canvas.style.width  = '800px';
     //canvas.style.height = '600px';
-
     var canvas = document.getElementById("myCanvas");
     canvas.width = document.body.clientWidth;
     canvas.height = canvas.width*0.75;    
@@ -56,6 +70,10 @@
 
     var ctx = canvas.getContext("2d"); // 取得繪圖環境
     
-   
+    function init(){
+        for(;i<12;i++)   loadImage();//想法：先全部load完(不算太大的img)比倒數時慢慢load又碰上網路不穩斷線好
+    }
+
+
     
 </script>
