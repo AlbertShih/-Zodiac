@@ -39,6 +39,7 @@
 </head>
 <body onload="init();">
     <canvas id="myCanvas"></canvas>
+    <div id="timer"></div>
     <div id="footer">AlbertShih</div>
 </body>
 </html>
@@ -57,19 +58,18 @@
         return dpr / bsr;
     })();*/
 
-    // var $ = function (el) {
-    //     return document.querySelector(el);
-    // };
-
-    // 比例為 4:3 ，橫向居中的方塊
+    var canvas = document.getElementById("myCanvas");
+    
     //canvas.style.width  = '800px';
     //canvas.style.height = '600px';
 
-    var canvas = document.getElementById("myCanvas");
-    //手機打直的時候占畫面寬度的80%，打橫的時候占畫面寬度的70% =>在CSS設定
+    //http://jeffdeng.me/js/2015/07/06/canvas-resolution/
+    //canvas.width/height 表示的是設備像素，而 canvas.style.width/height 表示的是CSS像素
 
+    // 比例為 4:3 ，橫向居中的方塊
+    //手機打直的時候占畫面寬度的80%，打橫的時候占畫面寬度的70% => 在CSS設定
     canvas.width = document.body.clientWidth;   
-    canvas.height = canvas.width*0.75;  //維持比例4:3 
+    canvas.height = canvas.width*0.75; 
     //addEventListener("resize", function(){console.log("canvas.width="+canvas.width+" canvas.height="+canvas.height);});
 
     var ctx = canvas.getContext("2d"); // 取得繪圖環境
@@ -78,7 +78,8 @@
     var diagonal = Math.pow(Math.pow(picWidth, 2) + Math.pow(picHeight, 2), 0.5);
     var itemArray = [];     //放圖片item的陣列
     var arr = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11];
-
+    var countdownnumber = 120;
+    var countdownid, showTimer;
     //var i = 0;  //目前處理第幾張照片item指標
 
     function Item(x, y, img) {          //圖片item的object
@@ -116,33 +117,46 @@
                 var img = new Image();       //new img element,並設定來源
                 img.src = "images/" + arr[index] + ".png";         
                 itemArray.push(new Item(drawX, drawY, img));     //push入array存放
-                /*img.addEventListener("load", function() {
-                    //alert("draw"+img.src+" "+drawX +" " +drawY);
-                    //readyToDraw(img, drawX, drawY);
-                }, false);*/ 
             }
         }  
     }
-  
+
+    var ani = ["豬","牛","虎","兔","龍","蛇","馬","羊","猴","雞","狗","鼠"];
+   
     var handleImage = function(index){
-        ctx.drawImage(itemArray[arr[index]].img, itemArray[arr[index]].x, itemArray[arr[index]].y , picWidth, picHeight); 
+
+        ctx.drawImage(itemArray[arr[index]].img, itemArray[arr[index]].x, itemArray[arr[index]].y , picWidth, picHeight);
+        console.log(ani[arr[index]]+" x:"+itemArray[arr[index]].x+" y:"+itemArray[arr[index]].y);
         ctx.rect(itemArray[arr[index]].x, itemArray[arr[index]].y, picWidth, picHeight);
         ctx.stroke();
     }
 
-    for(var i=0; i<12; i++)   prepareImage(i);//想法：先全部load完(不算太大的img)比倒數時慢慢load又碰上網路不穩斷線好,執行完這行才算body onload,才會跑init
+    var countdownfunc = function(){ 
+
+        showTimer.innerHTML = countdownnumber;
+        if(!(countdownnumber % 10)){
+            handleImage(12 - countdownnumber/10 - 1); 
+        }
+
+        if (countdownnumber == 0){
+            clearInterval(countdownid);
+        }
+        countdownnumber--;
+    }
+
+    //想法：先全部load完(不算太大的img)比倒數時慢慢load又碰上網路不穩斷線好,執行完這行才算body onload,才會跑init
+    for(var i=0; i<12; i++)   prepareImage(i);
 
     function init(){    
         
-        arr.sort(function() {return Math.random() - 0.5 });
-        //i = 0;
-        for(var i=0; i<12; i++) 
-            handleImage(i);
+        arr.sort(function() { return Math.random() - 0.5 });
+        showTimer = document.getElementById("timer");
+        showTimer.innerHTML = countdownnumber;
+        countdownnumber--;
+        countdownid = window.setInterval(countdownfunc,100);
     }
 
-
-        //http://jeffdeng.me/js/2015/07/06/canvas-resolution/
-        //canvas.width/height 表示的是设备像素，而 canvas.style.width/height 表示的是CSS像素
+       
 
        /* drawImage("images/" + arr[i] + ".png").then(function (img) {  
             //var img = document.createElement("img"); 
@@ -162,5 +176,4 @@
 
     }*/
     //});
-
 </script>
