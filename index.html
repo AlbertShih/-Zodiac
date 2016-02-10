@@ -78,7 +78,7 @@
     var diagonal = Math.pow(Math.pow(picWidth, 2) + Math.pow(picHeight, 2), 0.5);
     var itemArray = [];     //放圖片item的陣列
     var arr = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11];
-    var countdownnumber = 120;
+    var countdownnumber = 1200;
     var countdownid, showTimer;
     //var i = 0;  //目前處理第幾張照片item指標
 
@@ -133,9 +133,9 @@
 
     var countdownfunc = function(){ 
 
-        showTimer.innerHTML = countdownnumber;
-        if(!(countdownnumber % 10)){
-            handleImage(12 - countdownnumber/10 - 1); 
+        showTimer.innerHTML = countdownnumber/10;
+        if(!(countdownnumber % 100)){
+            handleImage(12 - countdownnumber/100 - 1); 
         }
 
         if (countdownnumber == 0){
@@ -214,7 +214,7 @@
         
         arr.sort(function() { return Math.random() - 0.5 });
         showTimer = document.getElementById("timer");
-        showTimer.innerHTML = countdownnumber;
+        showTimer.innerHTML = countdownnumber/10;
         countdownnumber--;
         countdownid = window.setInterval(countdownfunc,100);
     }
