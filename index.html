@@ -172,25 +172,70 @@
         scaleSizeY = canvas.height / (rect.bottom - rect.top);
     });
 
-    canvas.onmousedown = function(e){
-        
-        canMouseX = parseInt((e.clientX - rect.left) * scaleSizeX);  
-        canMouseY = parseInt((e.clientY - rect.top)  * scaleSizeY);
+    canvas.addEventListener('touchstart', function(e) {
+            console.log("touches");
+            canMouseX = parseInt((e.touches[0].pageX - rect.left) * scaleSizeX);  
+            canMouseY = parseInt((e.touches[0].pageY - rect.top)  * scaleSizeY);
+            /*var img = new Image();       //new img element,並設定來源
+            img.src = "images/1.png";         
+            
+            img.addEventListener("load", function() {
+                ctx.drawImage(img, canMouseX, canMouseY , picWidth, picHeight);
+                ctx.rect(canMouseX, canMouseY , picWidth, picHeight);
+                ctx.stroke();
+            }, false); */   
+            findImage(canMouseX, canMouseY);
+        })
+    canvas.addEventListener('touchend', function(e) {
+            console.log("touchend");
+            // canMouseX = parseInt((e.touches[0].pageX - rect.left) * scaleSizeX);  
+            // canMouseY = parseInt((e.touches[0].pageY - rect.top)  * scaleSizeY);
+            // clear the drag flag
+            isDragging = false;
+        })
+    canvas.addEventListener('touchcancel', function(e) {
+            canMouseX = parseInt((e.touches[0].pageX - rect.left) * scaleSizeX);  
+            canMouseY = parseInt((e.touches[0].pageY - rect.top)  * scaleSizeY);
+            // user has left the canvas, so clear the drag flag
+            isDragging=false;
+        })
+    canvas.addEventListener('touchmove', function(e) {
+            console.log("moving");
+            canMouseX = parseInt((e.touches[0].pageX - rect.left) * scaleSizeX);  
+            canMouseY = parseInt((e.touches[0].pageY - rect.top)  * scaleSizeY);
 
-        var img = new Image();       //new img element,並設定來源
-        img.src = "images/1.png";         
-        
-        /*img.addEventListener("load", function() {
-            ctx.drawImage(img, canMouseX, canMouseY , picWidth, picHeight);
-            ctx.rect(canMouseX, canMouseY , picWidth, picHeight);
-            ctx.stroke();
-        }, false); */
+            // if the drag flag is set, clear the canvas and draw the image
+            if(isDragging){
 
-        // set the drag flag
-        console.log("down");
-        findImage(canMouseX, canMouseY);
-    }
+                ctx.clearRect(itemArray[nowDrag].x, itemArray[nowDrag].y, picWidth, picHeight);
+                ctx.drawImage(itemArray[nowDrag].img, canMouseX - picWidth/2, canMouseY - picHeight/2, picWidth, picHeight);
+                //ctx.rect(canMouseX-picWidth/2, canMouseY-picHeight/2, picWidth, picHeight);
+                //ctx.stroke();
+                itemArray[nowDrag].x = canMouseX - picWidth/2;
+                itemArray[nowDrag].y = canMouseY - picHeight/2;
+            }
+        })
     
+    // canvas.onmousedown = function(e){
+    //     console.log("touches");
+    //     canMouseX = parseInt((e.clientX - rect.left) * scaleSizeX);  
+    //     canMouseY = parseInt((e.clientY - rect.top)  * scaleSizeY);
+
+    //     var img = new Image();       //new img element,並設定來源
+    //     img.src = "images/1.png";         
+        
+    //     img.addEventListener("load", function() {
+    //         ctx.drawImage(img, canMouseX, canMouseY , picWidth, picHeight);
+    //         ctx.rect(canMouseX, canMouseY , picWidth, picHeight);
+    //         ctx.stroke();
+    //     }, false); 
+
+    //     // set the drag flag
+    //     console.log("down");
+    //     findImage(canMouseX, canMouseY);
+    // }
+
+    /*
     canvas.onmouseup = function(e){
       canMouseX=parseInt((e.clientX - rect.left) * scaleSizeX);  
       canMouseY=parseInt((e.clientY - rect.top)  * scaleSizeY);
@@ -205,7 +250,7 @@
       isDragging=false;
     }
 
-    canvas.onmousemove = function(e){
+    canvas.ontouchmove = function(e){
       console.log("moving");
       canMouseX=parseInt((e.clientX - rect.left) * scaleSizeX);  
       canMouseY=parseInt((e.clientY - rect.top)  * scaleSizeY);
@@ -220,7 +265,7 @@
         itemArray[nowDrag].x = canMouseX-picWidth/2;
         itemArray[nowDrag].y = canMouseY-picHeight/2;
       }
-    }
+    }*/
     
     function init(){
         for(;i<12;i++)   loadImage();//想法：先全部load完(不算太大的img)比倒數時慢慢load又碰上網路不穩斷線好
