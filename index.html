@@ -45,7 +45,7 @@
 </html>
 
 <script>
-    /*潛在問題
+    /*//Device Pixel Ratio
     var PIXEL_RATIO = (function () {
         var ctx = document.createElement("canvas").getContext("2d"),
             dpr = window.devicePixelRatio || 1,
@@ -122,7 +122,7 @@
     }
 
     var ani = ["豬","牛","虎","兔","龍","蛇","馬","羊","猴","雞","狗","鼠"];
-   
+    
     var handleImage = function(index){
 
         ctx.drawImage(itemArray[arr[index]].img, itemArray[arr[index]].x, itemArray[arr[index]].y , picWidth, picHeight);
@@ -144,6 +144,69 @@
         countdownnumber--;
     }
 
+    /*//可拖拉及隨機移動  目前問題：定位client觸控座標與canvas座標不符
+    var offsetX = canvas.offsetLeft;
+    var offsetY = canvas.offsetTop;
+    var canvasWidth = canvas.width;
+    var canvasHeight = canvas.height;
+    // var isDragging = false;
+    // var nowDrag;
+
+    var findImage = function(x, y){
+        console.log("find  "+x+":"+y);
+        for(var i=0; i<12; i++){
+            if(x>itemArray[i].x && x<itemArray[i].x+picWidth && y>itemArray[i].y && y<itemArray[i].y+picHeight){
+                isDragging = true;
+                nowDrag = i;
+                console.log("isDragging=true");
+                return;
+            }
+        }
+        isDragging = false;
+        console.log("isDragging=false");
+    }
+
+    canvas.onmousedown = function(e){
+        var rect = canvas.getBoundingClientRect();
+        canMouseX = e.offsetX;
+        canMouseY = e.offsetY;
+        alert("x:"+canMouseX+"y"+canMouseY);
+        // set the drag flag
+        console.log("down");
+        findImage(canMouseX, canMouseY);
+    }
+
+    canvas.onmouseup = function(e){
+      canMouseX=parseInt(e.clientX-offsetX);
+      canMouseY=parseInt(e.clientY-offsetY);
+      // clear the drag flag
+      isDragging=false;
+    }
+
+    canvas.onmouseout = function(e){
+      canMouseX=parseInt(e.clientX-offsetX);
+      canMouseY=parseInt(e.clientY-offsetY);
+      // user has left the canvas, so clear the drag flag
+      isDragging=false;
+    }
+
+    canvas.onmousemove = function(e){
+      console.log("moving");
+      canMouseX=parseInt(e.clientX-offsetX);
+      canMouseY=parseInt(e.clientY-offsetY);
+
+      // if the drag flag is set, clear the canvas and draw the image
+      if(isDragging){
+        
+        ctx.clearRect(itemArray[nowDrag].x, itemArray[nowDrag].y, picWidth, picHeight);
+        ctx.drawImage(itemArray[nowDrag].img, canMouseX-picWidth/2,canMouseY-picHeight/2,picWidth,picHeight);
+        //ctx.rect(canMouseX-picWidth/2, canMouseY-picHeight/2, picWidth, picHeight);
+        //ctx.stroke();
+        itemArray[nowDrag].x = canMouseX-picWidth/2;
+        itemArray[nowDrag].y = canMouseY-picHeight/2;
+      }
+    }*/
+
     //想法：先全部load完(不算太大的img)比倒數時慢慢load又碰上網路不穩斷線好,執行完這行才算body onload,才會跑init
     for(var i=0; i<12; i++)   prepareImage(i);
 
@@ -156,24 +219,4 @@
         countdownid = window.setInterval(countdownfunc,100);
     }
 
-       
-
-       /* drawImage("images/" + arr[i] + ".png").then(function (img) {  
-            //var img = document.createElement("img"); 
-            //img.src = "images/" + arr[i] + ".png";
-            //$(".wrap").clientHeight / 3;
-            
-            var drawX = round(0, canvas.width*(7/8));
-            var drawY = round(0, canvas.height*(5/6));
-            
-            
-            ctx.drawImage(img, drawX, drawY , picWidth, picHeight);
-            ctx.rect(drawX, drawY, picWidth, picHeight);
-            ctx.stroke();
-                
-            //}
-        });
-
-    }*/
-    //});
 </script>
