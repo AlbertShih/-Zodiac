@@ -39,9 +39,12 @@
 <body onload="init();">
     <canvas id="myCanvas" ></canvas>
     <div id="timer"></div>
+    <div>AlbertShih</div>
 </body>
 </html>
-<script>//可能碰上問題
+<script>
+    //http://jeffdeng.me/js/2015/07/06/canvas-resolution/
+    //canvas.width/height 表示的是設備像素，而 canvas.style.width/height 表示的是CSS像素
     var PIXEL_RATIO = (function () {
         var ctx = document.createElement("canvas").getContext("2d"),
             dpr = window.devicePixelRatio || 1,
@@ -55,15 +58,13 @@
     })();
 
     // 比例為 4:3 ，橫向居中的方塊
-    
     var canvas = document.getElementById("myCanvas");
     //手機打直的時候占畫面寬度的 80%，打橫的時候占畫面寬度的 70%在CSS設定
-    canvas.width  = 800 * PIXEL_RATIO;
+    canvas.width  = 800 * PIXEL_RATIO;  //維持比例4:3
     canvas.height = 600 * PIXEL_RATIO;
-    // canvas.style.width = 800+'px';
-    // canvas.style.height = 600 + 'px';
-    // canvas.width = document.body.clientWidth * PIXEL_RATIO;   
-    // canvas.height = canvas.width*0.75 * PIXEL_RATIO;  //維持比例4:3
+   
+    // canvas.width = document.body.clientWidth * PIXEL_RATIO;     //不會自動scale
+    // canvas.height = canvas.width*0.75 * PIXEL_RATIO;  
     
     var ctx = canvas.getContext("2d"); // 取得繪圖環境
     //ctx.scale(PIXEL_RATIO, PIXEL_RATIO);
@@ -73,8 +74,8 @@
     var diagonal = Math.pow(Math.pow(picWidth, 2) + Math.pow(picHeight, 2), 0.5);
     var itemArray = [];     //放圖片item的陣列
     var arr = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11];
-    var countdownnumber = 120;
-    var countdownid, showTimer;
+    var countDownNum = 1200;        //120秒倒數
+    var countDownId, showTimer;
     
     function Item(x, y, img) {          //圖片item的object
         this.x = x;
@@ -93,7 +94,7 @@
 
         while(!isOk){
             var drawX = round(0, canvas.width*(7/8));   //canvas寬度為8倍圖片寬
-            var drawY = round(0, canvas.height*(5/6));  //canvas高度為6倍圖片ㄨ
+            var drawY = round(0, canvas.height*(5/6));  //canvas高度為6倍圖片高
             isOk = true;
 
             if(itemArray.length > 0){  
@@ -118,25 +119,23 @@
     var nowDrag;
     var ani = ["豬","牛","虎","兔","龍","蛇","馬","羊","猴","雞","狗","鼠"];
 
-    var handleImage = function(index){
+    var handleImage = function(index){          //畫出亂數過後的圖片
         ctx.drawImage(itemArray[arr[index]].img, itemArray[arr[index]].x, itemArray[arr[index]].y , picWidth, picHeight);
-        console.log(ani[arr[index]]+" x:"+itemArray[arr[index]].x+" y:"+itemArray[arr[index]].y);
-        // ctx.rect(itemArray[arr[index]].x, itemArray[arr[index]].y, picWidth, picHeight);
-        // ctx.stroke();
+        //console.log(ani[arr[index]]+" x:"+itemArray[arr[index]].x+" y:"+itemArray[arr[index]].y);
     }
 
-    var findImage = function(x, y){
-        console.log("find  "+x+":"+y);
+    var findImage = function(x, y){         //尋找目前觸控點選到的圖片
+        //console.log("find  "+x+":"+y);
         for(var i=0; i<12; i++){
             if(x>itemArray[i].x && x<itemArray[i].x+picWidth && y>itemArray[i].y && y<itemArray[i].y+picHeight){
                 isDragging = true;
                 nowDrag = i;
-                console.log("isDragging=true");
+                //console.log("isDragging=true");
                 return;
             }
         }
-        isDragging = false;
-        console.log("isDragging=false");
+        isDragging = false;         //如果沒有點選到圖片，則表示沒再拖曳
+        //console.log("isDragging=false");
     }
        
     var rect = canvas.getBoundingClientRect();
@@ -149,140 +148,70 @@
         scaleSizeY = canvas.height / (rect.bottom - rect.top);
     });
 
-    function startTouchEvent(){
+    function startTouchEvent(){     //新增觸控偵測事件
 
-        canvas.addEventListener('touchstart', function(e) {
-            console.log("touches");
+        canvas.addEventListener('touchstart', function(e) { //觸控事件開始
+            //console.log("touches");
             canMouseX = parseInt((e.touches[0].pageX - rect.left) * scaleSizeX);  
             canMouseY = parseInt((e.touches[0].pageY - rect.top)  * scaleSizeY);
-            /*var img = new Image();       //new img element,並設定來源
-            img.src = "images/1.png";         
-            
-            img.addEventListener("load", function() {
-                ctx.drawImage(img, canMouseX, canMouseY , picWidth, picHeight);
-                ctx.rect(canMouseX, canMouseY , picWidth, picHeight);
-                ctx.stroke();
-            }, false); */   
-            findImage(canMouseX, canMouseY);
+            findImage(canMouseX, canMouseY);    //偵測是否有選取到圖片
         })
-        canvas.addEventListener('touchend', function(e) {
-            console.log("touchend");
-            
+
+        canvas.addEventListener('touchend', function(e) {      //觸控事件結束
+            //console.log("touchend");
             isDragging = false;
         })
-        /*canvas.addEventListener('touchleave', function(e) {
-            e.preventDefault();
-
-            alert("leave");
+       
+        canvas.addEventListener('touchcancel', function(e) {    //觸控事件被取消
             canMouseX = parseInt((e.touches[0].pageX - rect.left) * scaleSizeX);  
             canMouseY = parseInt((e.touches[0].pageY - rect.top)  * scaleSizeY);
-            // user has left the canvas, so clear the drag flag
-            isDragging = false;
-        })*/
-        canvas.addEventListener('touchcancel', function(e) {
-            e.preventDefault();
-
-            alert("cancel");
-            canMouseX = parseInt((e.touches[0].pageX - rect.left) * scaleSizeX);  
-            canMouseY = parseInt((e.touches[0].pageY - rect.top)  * scaleSizeY);
-            // user has left the canvas, so clear the drag flag
             isDragging = false;
         })
+
         canvas.addEventListener('touchmove', function(e) {
-            console.log("moving");
+            //console.log("moving");
             canMouseX = parseInt((e.touches[0].pageX - rect.left) * scaleSizeX);  
             canMouseY = parseInt((e.touches[0].pageY - rect.top)  * scaleSizeY);
 
-            // if the drag flag is set, clear the canvas and draw the image
+            //如果正在拖曳圖片，則判斷是否超出邊界，如沒有就不斷clear跟draw
             if(isDragging){
 
                 if(canMouseX>picWidth/2 && canMouseX<canvas.width-picWidth/2 && canMouseY>picHeight/2 && canMouseY<canvas.height-picHeight/2){
 
                     ctx.clearRect(itemArray[nowDrag].x, itemArray[nowDrag].y, picWidth, picHeight);
                     ctx.drawImage(itemArray[nowDrag].img, canMouseX - picWidth/2, canMouseY - picHeight/2, picWidth, picHeight);
-                    //ctx.rect(canMouseX-picWidth/2, canMouseY-picHeight/2, picWidth, picHeight);
-                    //ctx.stroke();
                     itemArray[nowDrag].x = canMouseX - picWidth/2;
                     itemArray[nowDrag].y = canMouseY - picHeight/2;
 
-                    for(var i=0; i<12; i++){
-                        //if(i != nowDrag)
-                            ctx.drawImage(itemArray[i].img, itemArray[i].x, itemArray[i].y, picWidth, picHeight);
+                    for(var i=0; i<12; i++){        //防止圖片被覆蓋過，必須再重畫
+                        ctx.drawImage(itemArray[i].img, itemArray[i].x, itemArray[i].y, picWidth, picHeight);
                     }
+                    //正在拖曳的圖片會在最上層
                     ctx.drawImage(itemArray[nowDrag].img, itemArray[nowDrag].x, itemArray[nowDrag].y, picWidth, picHeight);
                 }
             }
         })
     }
-    /*//滑鼠事件
-    canvas.onmousedown = function(e){
-        console.log("touches");
-        canMouseX = parseInt((e.clientX - rect.left) * scaleSizeX);  
-        canMouseY = parseInt((e.clientY - rect.top)  * scaleSizeY);
 
-        var img = new Image();       //new img element,並設定來源
-        img.src = "images/1.png";         
-        
-        img.addEventListener("load", function() {
-            ctx.drawImage(img, canMouseX, canMouseY , picWidth, picHeight);
-            ctx.rect(canMouseX, canMouseY , picWidth, picHeight);
-            ctx.stroke();
-        }, false); 
-
-        // set the drag flag
-        console.log("down");
-        findImage(canMouseX, canMouseY);
-    }
-
-    canvas.onmouseup = function(e){
-      canMouseX=parseInt((e.clientX - rect.left) * scaleSizeX);  
-      canMouseY=parseInt((e.clientY - rect.top)  * scaleSizeY);
-      // clear the drag flag
-      isDragging=false;
-    }
-
-    canvas.onmouseout = function(e){
-      canMouseX=parseInt((e.clientX - rect.left) * scaleSizeX);  
-      canMouseY=parseInt((e.clientY - rect.top)  * scaleSizeY);
-      // user has left the canvas, so clear the drag flag
-      isDragging=false;
-    }
-
-    canvas.ontouchmove = function(e){
-      console.log("moving");
-      canMouseX=parseInt((e.clientX - rect.left) * scaleSizeX);  
-      canMouseY=parseInt((e.clientY - rect.top)  * scaleSizeY);
-
-      // if the drag flag is set, clear the canvas and draw the image
-      if(isDragging){
-        
-        ctx.clearRect(itemArray[nowDrag].x, itemArray[nowDrag].y, picWidth, picHeight);
-        ctx.drawImage(itemArray[nowDrag].img, canMouseX-picWidth/2, canMouseY-picHeight/2, picWidth, picHeight);
-        //ctx.rect(canMouseX-picWidth/2, canMouseY-picHeight/2, picWidth, picHeight);
-        //ctx.stroke();
-        itemArray[nowDrag].x = canMouseX-picWidth/2;
-        itemArray[nowDrag].y = canMouseY-picHeight/2;
-      }
-    }*/
-
-    var countdownfunc = function(){ 
-        showTimer.innerHTML = countdownnumber;
-        if(!(countdownnumber % 10)){
-            handleImage(12 - countdownnumber/10 - 1);
+    var countDownFunc = function(){         //每10秒出現一張圖  
+        if((countDownNum % 100) == 1){
+            handleImage(12 - (countDownNum-1)/100 - 1);
         }
-        if (countdownnumber == 0){
-            clearInterval(countdownid);
+        showTimer.innerHTML = parseInt(countDownNum/10);
+        if (countDownNum == 0){
+            clearInterval(countDownId);
             startTouchEvent();
-            countdownid = window.setInterval(randomMove, 10);
+            countDownId = window.setInterval(randomMove, 10);   //每10ms隨機走一步
         }
-        countdownnumber--;
+        countDownNum--;
     }
 
-    var nowMove = 0;
+    var nowMove = 0;       //目前選到要random walk的圖片
+
     var randomMove = function(){
         if(!isDragging){
             //ctx.clearRect(itemArray[nowMove].x, itemArray[nowMove].y, picWidth, picHeight);
-            moveOneStep(nowMove);
+            moveOneStep();
             //handleImage(nowMove, 'randomMove');
             if(nowMove == 11)
                 nowMove = 0;
@@ -291,7 +220,7 @@
         }
     }  
 
-    var moveOneStep = function(nowMove){
+    var moveOneStep = function(){
         ctx.clearRect(itemArray[nowMove].x, itemArray[nowMove].y, picWidth, picHeight);
         var isOk = false;
         while(!isOk){
@@ -312,15 +241,11 @@
     function init(){
 
         arr.sort(function() { return Math.random() - 0.5 });
-        //i = 0;
         showTimer = document.getElementById("timer");
-        showTimer.innerHTML = countdownnumber;
-        countdownnumber--;
-        countdownid = window.setInterval(countdownfunc,100);
+        showTimer.innerHTML = parseInt(countDownNum/10);
+        alert("go");
+        countDownNum--;
+        countDownId = window.setInterval(countDownFunc,100);
     }
-
-
-        //http://jeffdeng.me/js/2015/07/06/canvas-resolution/
-        //canvas.width/height 表示的是设备像素，而 canvas.style.width/height 表示的是CSS像素
 
 </script>
