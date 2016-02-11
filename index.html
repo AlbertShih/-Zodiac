@@ -120,10 +120,6 @@
         }  
     }
 
-    // var offsetX = canvas.offsetLeft;
-    // var offsetY = canvas.offsetTop;
-    // var canvasWidth = canvas.width;
-    // var canvasHeight = canvas.height;
     var isDragging = false;
     var nowDrag;
     var ani = ["豬","牛","虎","兔","龍","蛇","馬","羊","猴","雞","狗","鼠"];
@@ -135,7 +131,7 @@
         // ctx.stroke();
     }
 
-    function countdownfunc(){ 
+    var countdownfunc = function(){ 
         showTimer.innerHTML = countdownnumber;
         if(!(countdownnumber % 10)){
             handleImage();
@@ -143,8 +139,13 @@
         }
         if (countdownnumber == 0){
             clearInterval(countdownid);
+            //countdownid = window.setInterval(randomMove,1000);
         }
         countdownnumber--;
+    }
+    var nowMove = 0;
+    var randomMove = function(){
+        
     }
 
     var findImage = function(x, y){
@@ -173,53 +174,53 @@
     });
 
     canvas.addEventListener('touchstart', function(e) {
-            console.log("touches");
-            canMouseX = parseInt((e.touches[0].pageX - rect.left) * scaleSizeX);  
-            canMouseY = parseInt((e.touches[0].pageY - rect.top)  * scaleSizeY);
-            /*var img = new Image();       //new img element,並設定來源
-            img.src = "images/1.png";         
-            
-            img.addEventListener("load", function() {
-                ctx.drawImage(img, canMouseX, canMouseY , picWidth, picHeight);
-                ctx.rect(canMouseX, canMouseY , picWidth, picHeight);
-                ctx.stroke();
-            }, false); */   
-            findImage(canMouseX, canMouseY);
-        })
+        console.log("touches");
+        canMouseX = parseInt((e.touches[0].pageX - rect.left) * scaleSizeX);  
+        canMouseY = parseInt((e.touches[0].pageY - rect.top)  * scaleSizeY);
+        /*var img = new Image();       //new img element,並設定來源
+        img.src = "images/1.png";         
+        
+        img.addEventListener("load", function() {
+            ctx.drawImage(img, canMouseX, canMouseY , picWidth, picHeight);
+            ctx.rect(canMouseX, canMouseY , picWidth, picHeight);
+            ctx.stroke();
+        }, false); */   
+        findImage(canMouseX, canMouseY);
+    })
     canvas.addEventListener('touchend', function(e) {
-            console.log("touchend");
-            // canMouseX = parseInt((e.touches[0].pageX - rect.left) * scaleSizeX);  
-            // canMouseY = parseInt((e.touches[0].pageY - rect.top)  * scaleSizeY);
-            // clear the drag flag
-            isDragging = false;
-        })
-    canvas.addEventListener('touchcancel', function(e) {
-            canMouseX = parseInt((e.touches[0].pageX - rect.left) * scaleSizeX);  
-            canMouseY = parseInt((e.touches[0].pageY - rect.top)  * scaleSizeY);
-            // user has left the canvas, so clear the drag flag
-            isDragging=false;
-        })
+        console.log("touchend");
+        // canMouseX = parseInt((e.touches[0].pageX - rect.left) * scaleSizeX);  
+        // canMouseY = parseInt((e.touches[0].pageY - rect.top)  * scaleSizeY);
+        // clear the drag flag
+        isDragging = false;
+    })
+    canvas.addEventListener('touchout', function(e) {
+        canMouseX = parseInt((e.touches[0].pageX - rect.left) * scaleSizeX);  
+        canMouseY = parseInt((e.touches[0].pageY - rect.top)  * scaleSizeY);
+        // user has left the canvas, so clear the drag flag
+        isDragging=false;
+    })
     canvas.addEventListener('touchmove', function(e) {
-            console.log("moving");
-            canMouseX = parseInt((e.touches[0].pageX - rect.left) * scaleSizeX);  
-            canMouseY = parseInt((e.touches[0].pageY - rect.top)  * scaleSizeY);
+        console.log("moving");
+        canMouseX = parseInt((e.touches[0].pageX - rect.left) * scaleSizeX);  
+        canMouseY = parseInt((e.touches[0].pageY - rect.top)  * scaleSizeY);
 
-            // if the drag flag is set, clear the canvas and draw the image
-            if(isDragging){
+        // if the drag flag is set, clear the canvas and draw the image
+        if(isDragging){
 
-                ctx.clearRect(itemArray[nowDrag].x, itemArray[nowDrag].y, picWidth, picHeight);
-                ctx.drawImage(itemArray[nowDrag].img, canMouseX - picWidth/2, canMouseY - picHeight/2, picWidth, picHeight);
-                //ctx.rect(canMouseX-picWidth/2, canMouseY-picHeight/2, picWidth, picHeight);
-                //ctx.stroke();
-                itemArray[nowDrag].x = canMouseX - picWidth/2;
-                itemArray[nowDrag].y = canMouseY - picHeight/2;
+            ctx.clearRect(itemArray[nowDrag].x, itemArray[nowDrag].y, picWidth, picHeight);
+            ctx.drawImage(itemArray[nowDrag].img, canMouseX - picWidth/2, canMouseY - picHeight/2, picWidth, picHeight);
+            //ctx.rect(canMouseX-picWidth/2, canMouseY-picHeight/2, picWidth, picHeight);
+            //ctx.stroke();
+            itemArray[nowDrag].x = canMouseX - picWidth/2;
+            itemArray[nowDrag].y = canMouseY - picHeight/2;
 
-                for(var i=0; i<12; i++){
-                    //if(i != nowDrag)
-                        ctx.drawImage(itemArray[i].img, itemArray[i].x, itemArray[i].y, picWidth, picHeight);
-                }
-                ctx.drawImage(itemArray[nowDrag].img, itemArray[nowDrag].x, itemArray[nowDrag].y, picWidth, picHeight);
+            for(var i=0; i<12; i++){
+                //if(i != nowDrag)
+                    ctx.drawImage(itemArray[i].img, itemArray[i].x, itemArray[i].y, picWidth, picHeight);
             }
+            ctx.drawImage(itemArray[nowDrag].img, itemArray[nowDrag].x, itemArray[nowDrag].y, picWidth, picHeight);
+        }
         })
 
     // canvas.onmousedown = function(e){
@@ -273,9 +274,12 @@
       }
     }*/
     
+    //想法：先全部load完(不算太大的img)比倒數時慢慢load又碰上網路不穩斷線好
+    for(;i<12;i++)   loadImage();
+
     function init(){
-        for(;i<12;i++)   loadImage();//想法：先全部load完(不算太大的img)比倒數時慢慢load又碰上網路不穩斷線好
-        arr.sort(function() {return Math.random() - 0.5 });
+        
+        arr.sort(function() { return Math.random() - 0.5 });
         i = 0;
         showTimer = document.getElementById("timer");
         showTimer.innerHTML = countdownnumber;
