@@ -77,7 +77,7 @@
     var countDownNum = 1200;        //120秒倒數
     var countDownId, showTimer;
     
-    function Item(x, y, img) {          //圖片item的object
+    function Item(x, y, img) {          //圖片item的object prototype
         this.x = x;
         this.y = y;
         this.img = img;
@@ -148,7 +148,7 @@
         scaleSizeY = canvas.height / (rect.bottom - rect.top);
     });
 
-    function startTouchEvent(){     //新增觸控偵測事件
+    function startTouchEvent(){     //觸控事件偵測
 
         canvas.addEventListener('touchstart', function(e) { //觸控事件開始
             //console.log("touches");
@@ -200,7 +200,7 @@
         showTimer.innerHTML = parseInt(countDownNum/10);
         if (countDownNum == 0){
             clearInterval(countDownId);
-            startTouchEvent();
+            startTouchEvent();  //當倒數完，啟動觸控事件偵測
             countDownId = window.setInterval(randomMove, 10);   //每10ms隨機走一步
         }
         countDownNum--;
@@ -208,32 +208,28 @@
 
     var nowMove = 0;       //目前選到要random walk的圖片
 
-    var randomMove = function(){
+    var randomMove = function(){    //圖片隨機上下左右移動
         if(!isDragging){
-            //ctx.clearRect(itemArray[nowMove].x, itemArray[nowMove].y, picWidth, picHeight);
-            moveOneStep();
-            //handleImage(nowMove, 'randomMove');
-            if(nowMove == 11)
-                nowMove = 0;
-            else
-                nowMove++;
+
+            ctx.clearRect(itemArray[nowMove].x, itemArray[nowMove].y, picWidth, picHeight);
+            var isOk = false;
+
+            while(!isOk){   //隨機選擇上下左右移動15單位
+                var xNext = (Math.random() - 0.5) > 0 ? 15 : -15; 
+                var yNext = (Math.random() - 0.5) > 0 ? 15 : -15;   
+                if((itemArray[nowMove].x+xNext)>0 && (itemArray[nowMove].x+xNext)<canvas.width-picWidth && (itemArray[nowMove].y+yNext)>0 && (itemArray[nowMove].y+yNext)<canvas.height-picHeight)
+                    isOk = true;
+            }
+            //移動並紀錄最新座標回去
+            ctx.drawImage(itemArray[nowMove].img, itemArray[nowMove].x + xNext, itemArray[nowMove].y + yNext, picWidth, picHeight);
+            itemArray[nowMove].x = itemArray[nowMove].x + xNext;
+            itemArray[nowMove].y = itemArray[nowMove].y + yNext;
+            //12張圖片多工
+            if(nowMove == 11)   nowMove = 0;
+            else                nowMove++;
         }
     }  
 
-    var moveOneStep = function(){
-        ctx.clearRect(itemArray[nowMove].x, itemArray[nowMove].y, picWidth, picHeight);
-        var isOk = false;
-        while(!isOk){
-            var xNext = (Math.random() - 0.5) > 0 ? 15 : -15; 
-            var yNext = (Math.random() - 0.5) > 0 ? 15 : -15;   
-            if((itemArray[nowMove].x+xNext)>0 && (itemArray[nowMove].x+xNext)<canvas.width-picWidth && (itemArray[nowMove].y+yNext)>0 && (itemArray[nowMove].y+yNext)<canvas.height-picHeight)
-                isOk = true;
-        }
-        ctx.drawImage(itemArray[nowMove].img, itemArray[nowMove].x + xNext, itemArray[nowMove].y + yNext, picWidth, picHeight);
-        itemArray[nowMove].x = itemArray[nowMove].x + xNext;
-        itemArray[nowMove].y = itemArray[nowMove].y + yNext;
-
-    }
 
     //想法：先全部load完(不算太大的img)比倒數時慢慢load又碰上網路不穩斷線好
     for(var i=0; i<12; i++)   loadImage(i);
@@ -243,7 +239,6 @@
         arr.sort(function() { return Math.random() - 0.5 });
         showTimer = document.getElementById("timer");
         showTimer.innerHTML = parseInt(countDownNum/10);
-        alert("go");
         countDownNum--;
         countDownId = window.setInterval(countDownFunc,100);
     }
