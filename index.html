@@ -41,7 +41,7 @@
     <div id="timer"></div>
 </body>
 </html>
-<script>/*可能碰上問題
+<script>//可能碰上問題
     var PIXEL_RATIO = (function () {
         var ctx = document.createElement("canvas").getContext("2d"),
             dpr = window.devicePixelRatio || 1,
@@ -52,21 +52,22 @@
                   ctx.backingStorePixelRatio || 1;
 
         return dpr / bsr;
-    })();*/
-
-    // var $ = function (el) {
-    //     return document.querySelector(el);
-    // };
+    })();
 
     // 比例為 4:3 ，橫向居中的方塊
-    //canvas.style.width  = '800px';
-    //canvas.style.height = '600px';
+    
     var canvas = document.getElementById("myCanvas");
     //手機打直的時候占畫面寬度的 80%，打橫的時候占畫面寬度的 70%在CSS設定
-    canvas.width = document.body.clientWidth;   
-    canvas.height = canvas.width*0.75;  //維持比例4:3,  
+    canvas.width  = 800 * PIXEL_RATIO;
+    canvas.height = 600 * PIXEL_RATIO;
+    // canvas.style.width = 800+'px';
+    // canvas.style.height = 600 + 'px';
+    // canvas.width = document.body.clientWidth * PIXEL_RATIO;   
+    // canvas.height = canvas.width*0.75 * PIXEL_RATIO;  //維持比例4:3
     
     var ctx = canvas.getContext("2d"); // 取得繪圖環境
+    //ctx.scale(PIXEL_RATIO, PIXEL_RATIO);
+
     var picWidth = canvas.width/8;
     var picHeight = canvas.height/6;
     var diagonal = Math.pow(Math.pow(picWidth, 2) + Math.pow(picHeight, 2), 0.5);
@@ -86,7 +87,8 @@
         return (Math.random() * choices + min) | 0;
     }
 
-    var loadImage = function (index){        //設定並記錄圖片要畫在canvas中的座標位置,如跟其他張圖片重疊必須另取新位置
+    var loadImage = function (index){        
+    //設定並記錄圖片要畫在canvas中的座標位置,如跟其他張圖片重疊必須另取新位置
         var isOk = false;
 
         while(!isOk){
@@ -94,7 +96,8 @@
             var drawY = round(0, canvas.height*(5/6));  //canvas高度為6倍圖片ㄨ
             isOk = true;
 
-            if(itemArray.length > 0){  //判斷不重疊方式：生成之點不能位於已存在之相片左上角為圓心,對角線為直徑所畫之圓內
+            if(itemArray.length > 0){  
+            //判斷不重疊方式：生成之點不能位於已存在之相片左上角為圓心,對角線為直徑所畫之圓內
                 for(var i=0; i<itemArray.length; i++) { 
                      if(Math.pow(Math.pow(itemArray[i].x - drawX, 2) + Math.pow(itemArray[i].y - drawY, 2), 0.5) < diagonal){
                         isOk = false;
@@ -107,10 +110,6 @@
                 var img = new Image();       //new img element,並設定來源
                 img.src = "images/" + arr[index] + ".png";         
                 itemArray.push(new Item(drawX, drawY, img));     //push入array存放
-                /*img.addEventListener("load", function() {
-                    //alert("draw"+img.src+" "+drawX +" " +drawY);
-                    //readyToDraw(img, drawX, drawY);
-                }, false);*/ 
             }
         }  
     }
