@@ -67,7 +67,6 @@
     canvas.width = document.body.clientWidth;   
     canvas.height = canvas.width*0.75;  //維持比例4:3,  
     
-
     var ctx = canvas.getContext("2d"); // 取得繪圖環境
     var picWidth = canvas.width/8;
     var picHeight = canvas.height/6;
@@ -76,8 +75,6 @@
     var arr = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11];
     var countdownnumber = 120;
     var countdownid, showTimer;
-    var i = 0;
-
     
     function Item(x, y, img) {          //圖片item的object
         this.x = x;
@@ -90,7 +87,7 @@
         return (Math.random() * choices + min) | 0;
     }
 
-    var loadImage = function (){        //設定並記錄圖片要畫在canvas中的座標位置,如跟其他張圖片重疊必須另取新位置
+    var loadImage = function (index){        //設定並記錄圖片要畫在canvas中的座標位置,如跟其他張圖片重疊必須另取新位置
         var isOk = false;
 
         while(!isOk){
@@ -98,19 +95,18 @@
             var drawY = round(0, canvas.height*(5/6));  //canvas高度為6倍圖片ㄨ
             isOk = true;
 
-            if(i > 0){  //判斷不重疊方式：生成之點不能位於已存在之相片左上角為圓心,對角線為直徑所畫之圓內
-                for(var j=0; j<itemArray.length; j++) { 
-                     if(Math.pow(Math.pow(itemArray[j].x - drawX, 2) + Math.pow(itemArray[j].y - drawY, 2), 0.5) < diagonal){
+            if(itemArray.length > 0){  //判斷不重疊方式：生成之點不能位於已存在之相片左上角為圓心,對角線為直徑所畫之圓內
+                for(var i=0; i<itemArray.length; i++) { 
+                     if(Math.pow(Math.pow(itemArray[i].x - drawX, 2) + Math.pow(itemArray[i].y - drawY, 2), 0.5) < diagonal){
                         isOk = false;
                         break;
                      }
                      isOk = true;       //如果沒重疊,圖片可以生成在目前取得之座標位置
                 }
             }    
-
-            if(isOk){                                          
+            if(isOk){                                      
                 var img = new Image();       //new img element,並設定來源
-                img.src = "images/" + arr[i] + ".png";         
+                img.src = "images/" + arr[index] + ".png";         
                 itemArray.push(new Item(drawX, drawY, img));     //push入array存放
                 /*img.addEventListener("load", function() {
                     //alert("draw"+img.src+" "+drawX +" " +drawY);
@@ -124,28 +120,11 @@
     var nowDrag;
     var ani = ["豬","牛","虎","兔","龍","蛇","馬","羊","猴","雞","狗","鼠"];
 
-    var handleImage = function(){
-        ctx.drawImage(itemArray[arr[i]].img, itemArray[arr[i]].x, itemArray[arr[i]].y , picWidth, picHeight);
-        console.log(ani[arr[i]]+" x:"+itemArray[arr[i]].x+"y:"+itemArray[arr[i]].y);
-        // ctx.rect(itemArray[arr[i]].x, itemArray[arr[i]].y, picWidth, picHeight);
+    var handleImage = function(index){
+        ctx.drawImage(itemArray[arr[index]].img, itemArray[arr[index]].x, itemArray[arr[index]].y , picWidth, picHeight);
+        console.log(ani[arr[index]]+" x:"+itemArray[arr[index]].x+" y:"+itemArray[arr[index]].y);
+        // ctx.rect(itemArray[arr[index]].x, itemArray[arr[index]].y, picWidth, picHeight);
         // ctx.stroke();
-    }
-
-    var countdownfunc = function(){ 
-        showTimer.innerHTML = countdownnumber;
-        if(!(countdownnumber % 10)){
-            handleImage();
-            i++;
-        }
-        if (countdownnumber == 0){
-            clearInterval(countdownid);
-            //countdownid = window.setInterval(randomMove,1000);
-        }
-        countdownnumber--;
-    }
-    var nowMove = 0;
-    var randomMove = function(){
-        
     }
 
     var findImage = function(x, y){
@@ -161,8 +140,7 @@
         isDragging = false;
         console.log("isDragging=false");
     }
-    
-    
+       
     var rect = canvas.getBoundingClientRect();
     var scaleSizeX = canvas.width / (rect.right - rect.left);
     var scaleSizeY = canvas.height / (rect.bottom - rect.top);
@@ -189,16 +167,15 @@
     })
     canvas.addEventListener('touchend', function(e) {
         console.log("touchend");
-        // canMouseX = parseInt((e.touches[0].pageX - rect.left) * scaleSizeX);  
-        // canMouseY = parseInt((e.touches[0].pageY - rect.top)  * scaleSizeY);
-        // clear the drag flag
+        
         isDragging = false;
     })
-    canvas.addEventListener('touchout', function(e) {
+    canvas.addEventListener('touchleave', function(e) {
+        alert("leave");
         canMouseX = parseInt((e.touches[0].pageX - rect.left) * scaleSizeX);  
         canMouseY = parseInt((e.touches[0].pageY - rect.top)  * scaleSizeY);
         // user has left the canvas, so clear the drag flag
-        isDragging=false;
+        isDragging = false;
     })
     canvas.addEventListener('touchmove', function(e) {
         console.log("moving");
@@ -222,27 +199,27 @@
             ctx.drawImage(itemArray[nowDrag].img, itemArray[nowDrag].x, itemArray[nowDrag].y, picWidth, picHeight);
         }
         })
+    
+    /*//滑鼠事件
+    canvas.onmousedown = function(e){
+        console.log("touches");
+        canMouseX = parseInt((e.clientX - rect.left) * scaleSizeX);  
+        canMouseY = parseInt((e.clientY - rect.top)  * scaleSizeY);
 
-    // canvas.onmousedown = function(e){
-    //     console.log("touches");
-    //     canMouseX = parseInt((e.clientX - rect.left) * scaleSizeX);  
-    //     canMouseY = parseInt((e.clientY - rect.top)  * scaleSizeY);
-
-    //     var img = new Image();       //new img element,並設定來源
-    //     img.src = "images/1.png";         
+        var img = new Image();       //new img element,並設定來源
+        img.src = "images/1.png";         
         
-    //     img.addEventListener("load", function() {
-    //         ctx.drawImage(img, canMouseX, canMouseY , picWidth, picHeight);
-    //         ctx.rect(canMouseX, canMouseY , picWidth, picHeight);
-    //         ctx.stroke();
-    //     }, false); 
+        img.addEventListener("load", function() {
+            ctx.drawImage(img, canMouseX, canMouseY , picWidth, picHeight);
+            ctx.rect(canMouseX, canMouseY , picWidth, picHeight);
+            ctx.stroke();
+        }, false); 
 
-    //     // set the drag flag
-    //     console.log("down");
-    //     findImage(canMouseX, canMouseY);
-    // }
+        // set the drag flag
+        console.log("down");
+        findImage(canMouseX, canMouseY);
+    }
 
-    /*
     canvas.onmouseup = function(e){
       canMouseX=parseInt((e.clientX - rect.left) * scaleSizeX);  
       canMouseY=parseInt((e.clientY - rect.top)  * scaleSizeY);
@@ -273,14 +250,54 @@
         itemArray[nowDrag].y = canMouseY-picHeight/2;
       }
     }*/
-    
+
+    var countdownfunc = function(){ 
+        showTimer.innerHTML = countdownnumber;
+        if(!(countdownnumber % 10)){
+            handleImage(12 - countdownnumber/10 - 1);
+        }
+        if (countdownnumber == 0){
+            clearInterval(countdownid);
+            countdownid = window.setInterval(randomMove, 10);
+        }
+        countdownnumber--;
+    }
+
+    var nowMove = 0;
+    var randomMove = function(){
+        if(!isDragging){
+            //ctx.clearRect(itemArray[nowMove].x, itemArray[nowMove].y, picWidth, picHeight);
+            moveOneStep(nowMove);
+            //handleImage(nowMove, 'randomMove');
+            if(nowMove == 11)
+                nowMove = 0;
+            else
+                nowMove++;
+        }
+    }  
+
+    var moveOneStep = function(nowMove){
+        ctx.clearRect(itemArray[nowMove].x, itemArray[nowMove].y, picWidth, picHeight);
+        var isOk = false;
+        while(!isOk){
+            var xNext = (Math.random() - 0.5) > 0 ? 20 : -20; 
+            var yNext = (Math.random() - 0.5) > 0 ? 20 : -20;   
+            if((itemArray[nowMove].x+xNext)>0 && (itemArray[nowMove].x+xNext)<canvas.width-picWidth && (itemArray[nowMove].y+yNext)>0 && (itemArray[nowMove].y+yNext)<canvas.height-picHeight)
+                isOk = true;
+        }
+        ctx.drawImage(itemArray[nowMove].img, itemArray[nowMove].x + xNext, itemArray[nowMove].y + yNext, picWidth, picHeight);
+        itemArray[nowMove].x = itemArray[nowMove].x + xNext;
+        itemArray[nowMove].y = itemArray[nowMove].y + yNext;
+
+    }
+
     //想法：先全部load完(不算太大的img)比倒數時慢慢load又碰上網路不穩斷線好
-    for(;i<12;i++)   loadImage();
+    for(var i=0; i<12; i++)   loadImage(i);
 
     function init(){
-        
+
         arr.sort(function() { return Math.random() - 0.5 });
-        i = 0;
+        //i = 0;
         showTimer = document.getElementById("timer");
         showTimer.innerHTML = countdownnumber;
         countdownnumber--;
@@ -291,59 +308,4 @@
         //http://jeffdeng.me/js/2015/07/06/canvas-resolution/
         //canvas.width/height 表示的是设备像素，而 canvas.style.width/height 表示的是CSS像素
 
-       /* drawImage("images/" + arr[i] + ".png").then(function (img) {  
-            //var img = document.createElement("img"); 
-            //img.src = "images/" + arr[i] + ".png";
-            //$(".wrap").clientHeight / 3;
-            
-            var drawX = round(0, canvas.width*(7/8));
-            var drawY = round(0, canvas.height*(5/6));
-            
-            
-            ctx.drawImage(img, drawX, drawY , picWidth, picHeight);
-            ctx.rect(drawX, drawY, picWidth, picHeight);
-            ctx.stroke();
-                
-            //}
-        });
-
-    }*/
-    //});
-
-
-    /*
-    document.addEventListener("touchstart", function (e) {
-        var target = e.target;
-        if (e.target.tagName.toLowerCase() !== "canvas") {
-            return;
-        }
-        var ctx = target.getContext("2d");
-        var image = ctx.getImageData(0, 0, target.width, target.height);
-        var obj = target.cloneNode(true);
-        obj.getContext("2d").putImageData(image, 0, 0);
-        var top = target.getBoundingClientRect().top, left = target.getBoundingClientRect().left;
-        obj.style.cssText = "itemArrayition: absolute; top: " + top + "px; left: " + left + "px";
-        document.body.appendChild(obj);
-        var point = {"x": e.touches[0].pageX, "y": e.touches[0].pageY};
-        document.addEventListener("touchmove", touchMove = function (e) {
-            obj.style.cssText = "itemArrayition: absolute; top:" + (e.touches[0].pageY - point.y + top) + "px; left: " + (e.touches[0].pageX - point.x + left) + "px";
-        });
-        document.addEventListener("touchend", touchEnd = function (e) {
-            var itemArray = {"x": e.changedTouches[0].pageX, "y": e.changedTouches[0].pageY};
-            [].forEach.call(document.querySelectorAll(".wrap canvas"), function (item, i) {
-                var offset = item.getBoundingClientRect();
-                if (itemArray.x > offset.left && itemArray.x < (offset.left + item.width) && itemArray.y > offset.top && itemArray.y < (offset.top + item.height)) {
-                    var order1 = item.style.order;
-                    var order2 = target.style.order;
-                    if (obj.parentNode) {
-                        document.body.removeChild(obj);
-                    }
-                    item.style.order = order2;
-                    target.style.order = order1;
-                }
-            });
-            document.removeEventListener("touchmove", touchMove);
-            document.removeEventListener("touchend", touchEnd);
-        })
-    })*/
 </script>
