@@ -213,9 +213,15 @@
                 //ctx.stroke();
                 itemArray[nowDrag].x = canMouseX - picWidth/2;
                 itemArray[nowDrag].y = canMouseY - picHeight/2;
+
+                for(var i=0; i<12; i++){
+                    //if(i != nowDrag)
+                        ctx.drawImage(itemArray[i].img, itemArray[i].x, itemArray[i].y, picWidth, picHeight);
+                }
+                ctx.drawImage(itemArray[nowDrag].img, itemArray[nowDrag].x, itemArray[nowDrag].y, picWidth, picHeight);
             }
         })
-    
+
     // canvas.onmousedown = function(e){
     //     console.log("touches");
     //     canMouseX = parseInt((e.clientX - rect.left) * scaleSizeX);  
