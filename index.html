@@ -151,55 +151,71 @@
         scaleSizeY = canvas.height / (rect.bottom - rect.top);
     });
 
-    canvas.addEventListener('touchstart', function(e) {
-        console.log("touches");
-        canMouseX = parseInt((e.touches[0].pageX - rect.left) * scaleSizeX);  
-        canMouseY = parseInt((e.touches[0].pageY - rect.top)  * scaleSizeY);
-        /*var img = new Image();       //new img element,並設定來源
-        img.src = "images/1.png";         
-        
-        img.addEventListener("load", function() {
-            ctx.drawImage(img, canMouseX, canMouseY , picWidth, picHeight);
-            ctx.rect(canMouseX, canMouseY , picWidth, picHeight);
-            ctx.stroke();
-        }, false); */   
-        findImage(canMouseX, canMouseY);
-    })
-    canvas.addEventListener('touchend', function(e) {
-        console.log("touchend");
-        
-        isDragging = false;
-    })
-    canvas.addEventListener('touchleave', function(e) {
-        alert("leave");
-        canMouseX = parseInt((e.touches[0].pageX - rect.left) * scaleSizeX);  
-        canMouseY = parseInt((e.touches[0].pageY - rect.top)  * scaleSizeY);
-        // user has left the canvas, so clear the drag flag
-        isDragging = false;
-    })
-    canvas.addEventListener('touchmove', function(e) {
-        console.log("moving");
-        canMouseX = parseInt((e.touches[0].pageX - rect.left) * scaleSizeX);  
-        canMouseY = parseInt((e.touches[0].pageY - rect.top)  * scaleSizeY);
+    function startTouchEvent(){
 
-        // if the drag flag is set, clear the canvas and draw the image
-        if(isDragging){
-
-            ctx.clearRect(itemArray[nowDrag].x, itemArray[nowDrag].y, picWidth, picHeight);
-            ctx.drawImage(itemArray[nowDrag].img, canMouseX - picWidth/2, canMouseY - picHeight/2, picWidth, picHeight);
-            //ctx.rect(canMouseX-picWidth/2, canMouseY-picHeight/2, picWidth, picHeight);
-            //ctx.stroke();
-            itemArray[nowDrag].x = canMouseX - picWidth/2;
-            itemArray[nowDrag].y = canMouseY - picHeight/2;
-
-            for(var i=0; i<12; i++){
-                //if(i != nowDrag)
-                    ctx.drawImage(itemArray[i].img, itemArray[i].x, itemArray[i].y, picWidth, picHeight);
-            }
-            ctx.drawImage(itemArray[nowDrag].img, itemArray[nowDrag].x, itemArray[nowDrag].y, picWidth, picHeight);
-        }
+        canvas.addEventListener('touchstart', function(e) {
+            console.log("touches");
+            canMouseX = parseInt((e.touches[0].pageX - rect.left) * scaleSizeX);  
+            canMouseY = parseInt((e.touches[0].pageY - rect.top)  * scaleSizeY);
+            /*var img = new Image();       //new img element,並設定來源
+            img.src = "images/1.png";         
+            
+            img.addEventListener("load", function() {
+                ctx.drawImage(img, canMouseX, canMouseY , picWidth, picHeight);
+                ctx.rect(canMouseX, canMouseY , picWidth, picHeight);
+                ctx.stroke();
+            }, false); */   
+            findImage(canMouseX, canMouseY);
         })
-    
+        canvas.addEventListener('touchend', function(e) {
+            console.log("touchend");
+            
+            isDragging = false;
+        })
+        /*canvas.addEventListener('touchleave', function(e) {
+            e.preventDefault();
+
+            alert("leave");
+            canMouseX = parseInt((e.touches[0].pageX - rect.left) * scaleSizeX);  
+            canMouseY = parseInt((e.touches[0].pageY - rect.top)  * scaleSizeY);
+            // user has left the canvas, so clear the drag flag
+            isDragging = false;
+        })*/
+        canvas.addEventListener('touchcancel', function(e) {
+            e.preventDefault();
+
+            alert("cancel");
+            canMouseX = parseInt((e.touches[0].pageX - rect.left) * scaleSizeX);  
+            canMouseY = parseInt((e.touches[0].pageY - rect.top)  * scaleSizeY);
+            // user has left the canvas, so clear the drag flag
+            isDragging = false;
+        })
+        canvas.addEventListener('touchmove', function(e) {
+            console.log("moving");
+            canMouseX = parseInt((e.touches[0].pageX - rect.left) * scaleSizeX);  
+            canMouseY = parseInt((e.touches[0].pageY - rect.top)  * scaleSizeY);
+
+            // if the drag flag is set, clear the canvas and draw the image
+            if(isDragging){
+
+                if(canMouseX>picWidth/2 && canMouseX<canvas.width-picWidth/2 && canMouseY>picHeight/2 && canMouseY<canvas.height-picHeight/2){
+
+                    ctx.clearRect(itemArray[nowDrag].x, itemArray[nowDrag].y, picWidth, picHeight);
+                    ctx.drawImage(itemArray[nowDrag].img, canMouseX - picWidth/2, canMouseY - picHeight/2, picWidth, picHeight);
+                    //ctx.rect(canMouseX-picWidth/2, canMouseY-picHeight/2, picWidth, picHeight);
+                    //ctx.stroke();
+                    itemArray[nowDrag].x = canMouseX - picWidth/2;
+                    itemArray[nowDrag].y = canMouseY - picHeight/2;
+
+                    for(var i=0; i<12; i++){
+                        //if(i != nowDrag)
+                            ctx.drawImage(itemArray[i].img, itemArray[i].x, itemArray[i].y, picWidth, picHeight);
+                    }
+                    ctx.drawImage(itemArray[nowDrag].img, itemArray[nowDrag].x, itemArray[nowDrag].y, picWidth, picHeight);
+                }
+            }
+        })
+    }
     /*//滑鼠事件
     canvas.onmousedown = function(e){
         console.log("touches");
@@ -258,6 +274,7 @@
         }
         if (countdownnumber == 0){
             clearInterval(countdownid);
+            startTouchEvent();
             countdownid = window.setInterval(randomMove, 10);
         }
         countdownnumber--;
@@ -280,8 +297,8 @@
         ctx.clearRect(itemArray[nowMove].x, itemArray[nowMove].y, picWidth, picHeight);
         var isOk = false;
         while(!isOk){
-            var xNext = (Math.random() - 0.5) > 0 ? 20 : -20; 
-            var yNext = (Math.random() - 0.5) > 0 ? 20 : -20;   
+            var xNext = (Math.random() - 0.5) > 0 ? 15 : -15; 
+            var yNext = (Math.random() - 0.5) > 0 ? 15 : -15;   
             if((itemArray[nowMove].x+xNext)>0 && (itemArray[nowMove].x+xNext)<canvas.width-picWidth && (itemArray[nowMove].y+yNext)>0 && (itemArray[nowMove].y+yNext)<canvas.height-picHeight)
                 isOk = true;
         }
